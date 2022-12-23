@@ -13,11 +13,11 @@ namespace Efin.OptionsGo.Tests
                 // Arrange
                 var text = "LF @950.5 x 1";
                 // Act
-                Order o = Order.FromText(text,"");
+                Order? o = Order.FromText(text);
                 // Assert
-                Assert.NotNull(0);
+                Assert.NotNull(o);
                 Assert.Equal(expected :950.5,actual:o.Price);
-                Assert.Equal("$50X99",o.Symbol);
+                Assert.Equal("S50X99",o.Symbol);
                 Assert.Equal(OrderSide.Long,o.Side);
                 Assert.Equal(1,o.Contracts);
             }
@@ -28,11 +28,11 @@ namespace Efin.OptionsGo.Tests
                 // Arrange
                 var text = "SF @950.5 x 1";
                 // Act
-                Order o = Order.FromText(text, "");
+                Order? o = Order.FromText(text);
                 // Assert
-                Assert.NotNull(0);
+                Assert.NotNull(o);
                 Assert.Equal(expected :950.5,actual:o.Price);
-                Assert.Equal("$50X99",o.Symbol);
+                Assert.Equal("S50X99",o.Symbol);
                 Assert.Equal(OrderSide.Short,o.Side);
                 Assert.Equal(1,o.Contracts);
             }
@@ -42,11 +42,11 @@ namespace Efin.OptionsGo.Tests
                 // Arrange
                 var text = "SF @950.45 x 1";
                 // Act
-                Order o = Order.FromText(text, "");
+                Order? o = Order.FromText(text);
                 // Assert
-                Assert.NotNull(0);
+                Assert.NotNull(o);
                 Assert.Equal(expected :950.5,actual:o.Price);
-                Assert.Equal("$50X99",o.Symbol);
+                Assert.Equal("S50X99",o.Symbol);
                 Assert.Equal(OrderSide.Short,o.Side);
                 Assert.Equal(1,o.Contracts);
             }
@@ -91,11 +91,11 @@ namespace Efin.OptionsGo.Tests
             public void EXtraPrecisions_RoundToOneDigit(string text,double price)
             {
                 // Act
-                Order o = Order.FromText(text,"");
+                Order? o = Order.FromText(text);
                 // Assert
-                Assert.NotNull(0);
+                Assert.NotNull(o);
                 Assert.Equal(expected: price, actual: o!.Price);
-                Assert.Equal("$50X99", o.Symbol);
+                Assert.Equal("S50X99", o.Symbol);
                 Assert.Equal(OrderSide.Short, o.Side);
                 Assert.Equal(1, o.Contracts);
             }
@@ -115,7 +115,7 @@ namespace Efin.OptionsGo.Tests
             {
                 // Act
                
-                Order o = Order.FromText(text,"");
+                Order o = Order.FromText(text);
                 // Assert
                 Assert.NotNull(0);
                 //Assert.Equal(expected: price, actual: Double.Parse(o!.Price.ToString("N1")));
@@ -126,25 +126,25 @@ namespace Efin.OptionsGo.Tests
 
 
             [Theory]
-            [InlineData("LC 1000 @2.3 X 2", 2.3, "$50X99C", 1000, "L", 2)]
-            [InlineData("SC 1000 @2.5 X 1", 2.5, "$50X99C", 1000, "S", 1)]
-            [InlineData("LP 950 @12.6 X 1", 12.6, "$50X99P", 950, "L", 1)]
-            [InlineData("SP 950 @15 X 1", 15, "$50X99CP", 950, "S", 1)]
+            [InlineData("LC 1000 @2.3 X 2", 2.3, "S50X99C1000", 1000, "L", 2)]
+            [InlineData("SC 1000 @2.5 X 1", 2.5, "S50X99C1000", 1000, "S", 1)]
+            [InlineData("LP 950 @12.6 X 1", 12.6, "S50X99P950", 950, "L", 1)]
+            [InlineData("SP 950 @15 X 1", 15, "S50X99P950", 950, "S", 1)]
             public void BasicLongPutShortPut(string text, double price, string symbol, int strikeprice, string OrderSideFlag, int contracts)
             {
                 // Act
-                Order o = Order.FromText(text, symbol);
+                Order? o = Order.FromText(text);
                 // Assert
-                Assert.NotNull(0);
+                Assert.NotNull(o);
                 Assert.Equal(expected: price, actual: o!.Price);
-                Assert.Equal(symbol + strikeprice, o.Symbol);
-                if (OrderSideFlag != "L")
+                Assert.Equal(symbol, o.Symbol);
+                if (OrderSideFlag == "L")
                 {
-                    Assert.Equal(OrderSide.Short, o.Side);
+                    Assert.Equal(OrderSide.Long, o.Side);
                 }
                 else
                 {
-                    Assert.Equal(OrderSide.Long, o.Side);
+                    Assert.Equal(OrderSide.Short, o.Side);
                 }
                 Assert.Equal(strikeprice, o.StrikePrice);
                 Assert.Equal(contracts, o.Contracts);
@@ -166,16 +166,17 @@ namespace Efin.OptionsGo.Tests
                 // Act
                 foreach(var item in GetOptionList())
                 {
-                    var MainText = item[0].ToString().Replace("\"","");
+                    var MainText = item[0].ToString()?.Replace("\"","");
+                    if(string.IsNullOrEmpty(MainText))return;
                     var Text = MainText.Split(",");
                     Console.WriteLine(item);
 
 
-                    Order o = Order.FromText(Text[0], Text[2]);
+                    Order? o = Order.FromText(Text[0]);
                     // Assert
-                    Assert.NotNull(0);
+                    Assert.NotNull(o);
                     Assert.Equal(expected: Double.Parse(Text[1]), actual: o!.Price);
-                    Assert.Equal(Text[2] + Text[3], o.Symbol);
+                    Assert.Equal(Text[2], o.Symbol);
                     if (Text[4] != "L")
                     {
                         Assert.Equal(OrderSide.Short, o.Side);

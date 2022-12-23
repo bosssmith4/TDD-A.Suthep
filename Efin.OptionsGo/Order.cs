@@ -3,12 +3,12 @@
 
     public class Order
     {
-        public Order(double price,string symbol,OrderSide side,int contracts,int strikeprice)
+        public Order(double price, string symbol, OrderSide side, int contracts, int strikeprice)
         {
-            Price= price;
-            Symbol= symbol;
-            Side= side;
-            Contracts= contracts;
+            Price = price;
+            Symbol = symbol;
+            Side = side;
+            Contracts = contracts;
             StrikePrice = strikeprice;
         }
         public double Price { get; }
@@ -19,77 +19,79 @@
 
         // "LF 950 x 1"
         // Price = 950 , Symbol = $50x99,Side = "Long", Contracts =1
-        public static Order FromText(string text,string Symbol)
+        public static Order? FromText(string text)
         {
             try
             {
-
-                var SideType = text.Split(" ")[0].ToUpper();
-                Console.WriteLine(SideType);
+                var data = text.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+                var sideType = data[0].ToUpper();
+                Console.WriteLine(sideType);
                 double price = 0;
-                string symbol = string.Empty;
-                var side = new OrderSide();
+                string symbol = "S50X99";
+                OrderSide side;
                 int contracts = 0;
-                int strikeprice = 0;
+                int strikePrice = 0; // CamelCase
 
-                if (SideType == "LF")
+                if (sideType == "LF")
                 {
-                    price = Double.Parse(text.Split(" ")[1].Replace("@", ""));
+                    price = double.Parse(data[1].Replace("@", ""));
                     side = OrderSide.Long;
-                    contracts = Int32.Parse(text.Split(" ")[3]);
-                    symbol = "$50X99";
+                    contracts = Int32.Parse(data[3]);
                 }
-                else if (SideType == "SF")
+                else if (sideType == "SF")
                 {
-                    price = Double.Parse(text.Split(" ")[1].Replace("@", ""));
+                    price = double.Parse(data[1].Replace("@", ""));
                     side = OrderSide.Short;
-                    contracts = Int32.Parse(text.Split(" ")[3]);
-                    symbol = "$50X99";
+                    contracts = Int32.Parse(data[3]);
                 }
-                else if (SideType == "LC")
+                else if (sideType == "LC")
                 {
-                    price = Double.Parse(text.Split(" ")[2].Replace("@", ""));
+                    price = double.Parse(data[2].Replace("@", ""));
                     side = OrderSide.Long;
-                    contracts = Int32.Parse(text.Split(" ")[4]);
-                    symbol = Symbol+ text.Split(" ")[1];
-                    strikeprice = Int32.Parse(text.Split(" ")[1]);
+                    contracts = Int32.Parse(data[4]);
+                    strikePrice = Int32.Parse(data[1]);
+                    symbol += "C"+ strikePrice;
                 }
-                else if (SideType == "SC")
+                else if (sideType == "SC")
                 {
-                    price = Double.Parse(text.Split(" ")[2].Replace("@", ""));
+                    price = double.Parse(data[2].Replace("@", ""));
                     side = OrderSide.Short;
-                    contracts = Int32.Parse(text.Split(" ")[4]);
-                    symbol = Symbol + text.Split(" ")[1];
-                    strikeprice = Int32.Parse(text.Split(" ")[1]);
+                    contracts = Int32.Parse(data[4]);
+                    strikePrice = Int32.Parse(data[1]);
+                    symbol += "C" + strikePrice;
                 }
-                else if (SideType == "LP")
+                else if (sideType == "LP")
                 {
-                    price = Double.Parse(text.Split(" ")[2].Replace("@", ""));
+                    price = double.Parse(data[2].Replace("@", ""));
                     side = OrderSide.Long;
-                    contracts = Int32.Parse(text.Split(" ")[4]);
-                    symbol = Symbol + text.Split(" ")[1];
-                    strikeprice = Int32.Parse(text.Split(" ")[1]);
+                    contracts = Int32.Parse(data[4]);
+                    strikePrice = Int32.Parse(data[1]);
+                    symbol += "P" + strikePrice;
                 }
-                else if (SideType == "SP")
+                else if (sideType == "SP")
                 {
-                    price = Double.Parse(text.Split(" ")[2].Replace("@", ""));
+                    price = double.Parse(data[2].Replace("@", ""));
                     side = OrderSide.Short;
-                    contracts = Int32.Parse(text.Split(" ")[4]);
-                    symbol = Symbol + text.Split(" ")[1];
-                    strikeprice = Int32.Parse(text.Split(" ")[1]);
+                    contracts = Int32.Parse(data[4]);
+                    strikePrice = Int32.Parse(data[1]);
+                    symbol += "P" + strikePrice;
+                }
+                else
+                {
+                    return null;
                 }
 
-                price = Double.Parse(String.Format("{0:0.0}", price));
-                //price = Math.Round((Double)price, 1);
-                var o = new Order(price, symbol, side, contracts,strikeprice);
+                //price = double.Parse(String.Format("{0:0.0}", price));
+                price = Math.Round((double)price, 1,MidpointRounding.AwayFromZero);
+                var o = new Order(price, symbol, side, contracts, strikePrice);
 
                 return o;
             }
-            catch (Exception e)
+            catch 
             {
                 return null;
             }
-            
+
         }
     }
 }
