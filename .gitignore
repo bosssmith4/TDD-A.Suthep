@@ -53,3 +53,11 @@ Efin.OptionsGo/Efin.OptionsGo.Tests/bin/
 Efin.OptionsGo/Efin.OptionsGo.Tests/obj/
 Efin.OptionsGo/Efin.OptionsGo/obj/
 Efin.OptionsGo/Efin.OptionsGo/bin/
+*.v2
+*.vsidx
+*.lock
+.vs/Efin.OptionsGo/v17/.suo
+*.testlog
+.vs/Efin.OptionsGo/v17/TestStore/0/testlog.manifest
+*.2
+Efin.OptionsGo.Tests/bin/Debug/net6.0/CoverletSourceRootsMapping
